@@ -1,0 +1,85 @@
+:root{
+    --text-color-default: #afa8a8;
+    --button-bg-color-default: darkblue;
+    --button-bg-color-hover-default: #0505a7;
+}
+
+body{
+    background-color: #3c3c3c;
+    color: var(--text-color-default);
+    margin: 0;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 0.5rem;
+    border-radius: 5px;
+    border: none;
+    color: white;
+    font-weight: 600;
+    background-color: var(--button-bg-color-default);
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: var(--button-bg-color-hover-default);
+}
+
+input {
+    padding: 0.2rem;
+    border-radius: 5px;
+}
+
+header {
+    padding: 1rem;
+    box-shadow: 1px 3px 11px black;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.section {
+    border: 1px inset black;
+    width: fit-content;
+    padding: 1rem;
+    margin: 1rem;
+    border-radius: 5px;
+}
+
+#register-user form{
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+#register-user form>div{
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* #register-user {
+    
+} */
+
+#login-form {
+    margin: 5rem auto;
+}
+
+#login-form>form{
+    padding-top: 1rem;
+}
+
+#login-form div{
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#login-form button[type="submit"]{
+    margin-left: auto;
+    margin-top: 1rem;
+}

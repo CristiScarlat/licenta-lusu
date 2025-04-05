@@ -1,0 +1,16 @@
+{
+  "name": "control-access-ui",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "dependencies": {
+    "firebase": "^11.5.0",
+    "open": "^10.1.0"
+  }
+}
