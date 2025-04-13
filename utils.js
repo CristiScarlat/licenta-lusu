@@ -15,3 +15,9 @@ export function getReqBody(req) {
         })
     })
 }
+
+const timerId = null;
+
+export function openDoorWithTimer(doorNo) {
+    
+}

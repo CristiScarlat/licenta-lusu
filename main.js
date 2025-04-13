@@ -6,13 +6,13 @@ import url from 'url';
 // import { saveSchedule } from "./scheduleHandler.js";
 import { getDataByCardID, login, logout } from "./services/fb.js";
 import { getReqBody } from "./utils.js";
+import { openDoorWithTimer, getRelaysState } from './services/rpi.js';
 
 function runWebserver() {
     const host = 'localhost';
     const port = 8000;
 
     const requestListener = async function (req, res) {
-        console.log(req.body)
         if (req.method === "GET" && req.url === "/") {
             fs.readFile("./public/index.html", (error, data) => {
                 if (error) {
@@ -109,6 +109,33 @@ function runWebserver() {
                 res.setHeader("Content-Type", "application/json");
                 res.writeHead(200);
                 res.end(JSON.stringify({ logout: "success" }));
+            }
+            catch (error) {
+                res.setHeader("Content-Type", "application/json");
+                res.writeHead(500);
+                res.end(JSON.stringify(error));
+            }
+        }
+        else if (req.method === "POST" && req.url.includes("/access-gate")) {
+            try {
+                const doorNo = req.url.split("/").pop();
+                openDoorWithTimer(doorNo)
+                res.setHeader("Content-Type", "application/json");
+                res.writeHead(200);
+                res.end(JSON.stringify({ doorNo }));
+            }
+            catch (error) {
+                res.setHeader("Content-Type", "application/json");
+                res.writeHead(500);
+                res.end(JSON.stringify(error));
+            }
+        }
+        else if (req.method === "GET" && req.url.includes("/access-gate")) {
+            try {
+                const relaysState = getRelaysState();
+                res.setHeader("Content-Type", "application/json");
+                res.writeHead(200);
+                res.end(JSON.stringify({ doors:  relaysState}));
             }
             catch (error) {
                 res.setHeader("Content-Type", "application/json");

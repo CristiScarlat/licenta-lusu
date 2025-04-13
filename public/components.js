@@ -20,7 +20,7 @@ export function testCardIDInput() {
 export function scannedCardInfoSection(data) {
     const container = document.createElement("div");
     container.className = "section";
-    container.id = "user-info"
+    container.id = "users-access-display"
     container.innerHTML = `
         
     `
@@ -82,4 +82,30 @@ export function loginForm() {
     `
     return container;
 
+}
+
+export function closedDoorIcon() {
+    const container = document.createElement("div");
+    container.className = "";
+    container.id = "closed-door";
+    container.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M96 64c0-35.3 28.7-64 64-64L416 0c35.3 0 64 28.7 64 64l0 384 64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-112 0-288 0L32 512c-17.7 0-32-14.3-32-32s14.3-32 32-32l64 0L96 64zM384 288a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"/></svg>`;
+    return container;
+}
+
+export function openDoorIcon() {
+    const container = document.createElement("div");
+    container.className = "";
+    container.id = "closed-door";
+    container.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M320 32c0-9.9-4.5-19.2-12.3-25.2S289.8-1.4 280.2 1l-179.9 45C79 51.3 64 70.5 64 92.5L64 448l-32 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 192 0 32 0 0-32 0-448zM256 256c0 17.7-10.7 32-24 32s-24-14.3-24-32s10.7-32 24-32s24 14.3 24 32zm96-128l96 0 0 352c0 17.7 14.3 32 32 32l64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-32 0 0-320c0-35.3-28.7-64-64-64l-96 0 0 64z"/></svg>`;
+    return container;
+}
+
+export function doorsSection(noOfDoors=1){
+    const container = document.createElement("div");
+    container.className = "section";
+    container.id = "doors-section";
+    for(let i=0; i<noOfDoors; i++){
+        container.append(closedDoorIcon());
+    }
+    return container;
 }
