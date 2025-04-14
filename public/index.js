@@ -4,6 +4,12 @@ const mainContainer = document.getElementById("app");
 const userStr = localStorage.getItem("user");
 const user = userStr ? JSON.parse(userStr) : null;
 
+const hbtn = document.getElementById("get-history");
+
+hbtn.addEventListener("click", () => {
+    fetch('/history')
+})
+
 if (user?.uid) {
     renderMainScreen();
 }
@@ -42,22 +48,32 @@ function renderMainScreen() {
             const cardIdValue = scanedIdInput.value;
             const res = await fetch(`/cardID/${cardIdValue}`);
             const { data } = await res.json();
-            console.log(data)
+            const loginData = JSON.parse(localStorage.getItem("user"));
+            let accessData = null
             if (data === undefined || Object.keys(data).length === 0) {
                 userInfo.style.backgroundColor = "darkred";
                 userInfo.innerText = "Card neînregistrat, accesul nu este permis!";
-                return
+                accessData = {
+                    cardIdValue,
+                    error: "Card neînregistrat, accesul nu este permis!",
+                    operatorEmail: loginData.email,
+                    operatorUID: loginData.uid,
+                    time: Date.now()
+                }
             }
-            const loginData = JSON.parse(localStorage.getItem("user"));
-            const accessData = {
-                ...data,
-                operatorEmail: loginData.email,
-                operatorUID: loginData.uid,
-                time: Date.now()
+            else {
+                accessData = {
+                    ...data,
+                    cardIdValue,
+                    error: null,
+                    operatorEmail: loginData.email,
+                    operatorUID: loginData.uid,
+                    time: Date.now()
+                }
+                userInfo.style.backgroundColor = "darkgreen";
+                userInfo.innerText = `Aces permis pentru | ${data.name} | prin poarta | ${data.accessDoor} |.`;
             }
-            await fetch(`/access-gate/${data.accessDoor}`, { method: "POST", body: JSON.stringify(accessData) })
-            userInfo.style.backgroundColor = "darkgreen";
-            userInfo.innerText = `Aces permis pentru | ${data.name} | prin poarta | ${data.accessDoor} |.`;
+            await fetch('/access-gate', { method: "POST", body: JSON.stringify(accessData) }) 
         }
         catch (error) {
             console.log(error)

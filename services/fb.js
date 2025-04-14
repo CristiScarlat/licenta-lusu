@@ -47,11 +47,22 @@ export const getDataByCardID = async (cardId) => {
 
 export const addAccessDataToHistoryDB = async (data) => {
     try {
-
-        console.log(data)
+        console.log(">>>>>>>", data)
         const docsRef = doc(db, 'control-access-app', 'history');
         return setDoc(docsRef, { [data.time]: data }, { merge: true });
         // return docSnap.get(cardId)
+    }
+    catch (error) {
+        console.log(error)
+        throw new Error("Could not read data from db")
+    }
+}
+
+export const getAccessDataToHistoryDB = async (data) => {
+    try {
+        const docsRef = doc(db, 'control-access-app', 'history');
+        const docSnap = await getDoc(docsRef);
+        return await docSnap.data();
     }
     catch (error) {
         console.log(error)

@@ -27,6 +27,16 @@ export function scannedCardInfoSection(data) {
     return container;
 }
 
+export function logsContainer(data) {
+    const container = document.createElement("div");
+    container.className = "section";
+    container.id = "history-section"
+    container.innerHTML = `
+        
+    `
+    return container;
+}
+
 export function addUserFormSection(data) {
     const container = document.createElement("div");
     container.className = "section";

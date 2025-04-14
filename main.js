@@ -4,7 +4,7 @@ import fs, { access } from 'fs';
 import url from 'url';
 // import { toggleRelay, getRelaysState } from "./gpio.js";
 // import { saveSchedule } from "./scheduleHandler.js";
-import { getDataByCardID, login, logout, addAccessDataToHistoryDB } from "./services/fb.js";
+import { getDataByCardID, login, logout, addAccessDataToHistoryDB, getAccessDataToHistoryDB } from "./services/fb.js";
 import { getReqBody } from "./utils.js";
 import { openDoorWithTimer, getRelaysState } from './services/rpi.js';
 
@@ -119,13 +119,14 @@ function runWebserver() {
         else if (req.method === "POST" && req.url.includes("/access-gate")) {
             try {
                 const accessData = await getReqBody(req);
-                openDoorWithTimer(accessData.accessDoor);
+                if(accessData?.accessDoor)openDoorWithTimer(accessData.accessDoor);
                 await addAccessDataToHistoryDB(accessData);
                 res.setHeader("Content-Type", "application/json");
                 res.writeHead(200);
                 res.end(JSON.stringify({ accessData }));
             }
             catch (error) {
+                console.log(error)
                 res.setHeader("Content-Type", "application/json");
                 res.writeHead(500);
                 res.end(JSON.stringify(error));
@@ -142,6 +143,21 @@ function runWebserver() {
                 res.setHeader("Content-Type", "application/json");
                 res.writeHead(500);
                 res.end(JSON.stringify(error));
+            }
+        }
+        else if (req.method === "GET" && req.url === "/history") {
+            try {
+                console.log("history-logs")
+                const logs = await getAccessDataToHistoryDB();
+                res.setHeader("Content-Type", "application/json");
+                res.writeHead(200);
+                res.end(JSON.stringify(logs));
+            }
+            catch (error) {
+                console.log(error)
+                res.setHeader("Content-Type", "application/json");
+                res.writeHead(500);
+                res.end(JSON.stringify({error}));
             }
         }
     };
