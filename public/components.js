@@ -100,12 +100,12 @@ export function openDoorIcon() {
     return container;
 }
 
-export function doorsSection(noOfDoors=1){
+export function doorsSection(doorsArray){
     const container = document.createElement("div");
     container.className = "section";
     container.id = "doors-section";
-    for(let i=0; i<noOfDoors; i++){
-        container.append(closedDoorIcon());
-    }
+    doorsArray.forEach(door => {
+        door ? container.append(openDoorIcon()) : container.append(closedDoorIcon());
+    });
     return container;
 }

@@ -1,10 +1,10 @@
 import open from 'open';
 import http from 'http';
-import fs from 'fs';
+import fs, { access } from 'fs';
 import url from 'url';
 // import { toggleRelay, getRelaysState } from "./gpio.js";
 // import { saveSchedule } from "./scheduleHandler.js";
-import { getDataByCardID, login, logout } from "./services/fb.js";
+import { getDataByCardID, login, logout, addAccessDataToHistoryDB } from "./services/fb.js";
 import { getReqBody } from "./utils.js";
 import { openDoorWithTimer, getRelaysState } from './services/rpi.js';
 
@@ -118,11 +118,12 @@ function runWebserver() {
         }
         else if (req.method === "POST" && req.url.includes("/access-gate")) {
             try {
-                const doorNo = req.url.split("/").pop();
-                openDoorWithTimer(doorNo)
+                const accessData = await getReqBody(req);
+                openDoorWithTimer(accessData.accessDoor);
+                await addAccessDataToHistoryDB(accessData);
                 res.setHeader("Content-Type", "application/json");
                 res.writeHead(200);
-                res.end(JSON.stringify({ doorNo }));
+                res.end(JSON.stringify({ accessData }));
             }
             catch (error) {
                 res.setHeader("Content-Type", "application/json");
@@ -148,7 +149,7 @@ function runWebserver() {
     const server = http.createServer(requestListener);
     server.listen(port, host, () => {
         console.log(`Server is running on http://${host}:${port}`);
-        open(`http://${host}:${port}`, { app: ['google chrome', '--kiosk'] });
+        //open(`http://${host}:${port}`, { app: ['google chrome', '--kiosk'] });
     });
 }
 

@@ -25,7 +25,7 @@ function renderMainScreen() {
     const sectionLeft = document.createElement("div");
     sectionLeft.style.maxWidth = "20rem";
     const sectionRight = document.createElement("div");
-    sectionLeft.append(testCardIDInput(), doorsSection(4), scannedCardInfoSection())
+    sectionLeft.append(testCardIDInput(), doorsSection([0,0,0,0]), scannedCardInfoSection())
 
     contentContainer.append(sectionLeft, sectionRight)
     mainContainer.append(header(), contentContainer);
@@ -48,9 +48,16 @@ function renderMainScreen() {
                 userInfo.innerText = "Card neînregistrat, accesul nu este permis!";
                 return
             }
+            const loginData = JSON.parse(localStorage.getItem("user"));
+            const accessData = {
+                ...data,
+                operatorEmail: loginData.email,
+                operatorUID: loginData.uid,
+                time: Date.now()
+            }
+            await fetch(`/access-gate/${data.accessDoor}`, { method: "POST", body: JSON.stringify(accessData) })
             userInfo.style.backgroundColor = "darkgreen";
             userInfo.innerText = `Aces permis pentru | ${data.name} | prin poarta | ${data.accessDoor} |.`;
-            await fetch(`/access-gate/${data.accessDoor}`, { method: "POST" })
         }
         catch (error) {
             console.log(error)
@@ -97,15 +104,20 @@ function initPool() {
         try {
             const res = await fetch('/access-gate')
             const data = await res.json();
-            console.log(data.doors)
+            const presentDoorsSection = document.getElementById("doors-section");
+            if(presentDoorsSection){
+                const doors = doorsSection(data.doors);
+                presentDoorsSection.replaceWith(doors);
+            }
+
         }
         catch (error) {
             console.log(error)
         }
-    }, 1000)
+    }, 500)
 }
 
-initPool();
+//initPool();
 
 
 
