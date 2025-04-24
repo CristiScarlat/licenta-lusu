@@ -4,7 +4,7 @@ import fs, { access } from 'fs';
 import url from 'url';
 // import { toggleRelay, getRelaysState } from "./gpio.js";
 // import { saveSchedule } from "./scheduleHandler.js";
-import { getDataByCardID, login, logout, addAccessDataToHistoryDB, getAccessDataToHistoryDB } from "./services/fb.js";
+import { getDataByCardID, login, logout, addAccessDataToHistoryDB, getAccessDataFromHistoryDB } from "./services/fb.js";
 import { getReqBody } from "./utils.js";
 import { openDoorWithTimer, getRelaysState } from './services/rpi.js';
 
@@ -63,6 +63,18 @@ function runWebserver() {
         }
         else if (req.method === "GET" && req.url.includes("components.js")) {
             fs.readFile("./public/components.js", (error, data) => {
+                if (error) {
+                    res.writeHead(500);
+                    res.end(err);
+                    return;
+                }
+                res.setHeader("Content-Type", "application/javascript");
+                res.writeHead(200);
+                res.end(data);
+            })
+        }
+        else if (req.method === "GET" && req.url.includes("router.js")) {
+            fs.readFile("./public/router.js", (error, data) => {
                 if (error) {
                     res.writeHead(500);
                     res.end(err);
@@ -147,17 +159,15 @@ function runWebserver() {
         }
         else if (req.method === "GET" && req.url === "/history") {
             try {
-                console.log("history-logs")
-                const logs = await getAccessDataToHistoryDB();
+                const logs = await getAccessDataFromHistoryDB();
                 res.setHeader("Content-Type", "application/json");
                 res.writeHead(200);
                 res.end(JSON.stringify(logs));
             }
             catch (error) {
-                console.log(error)
                 res.setHeader("Content-Type", "application/json");
                 res.writeHead(500);
-                res.end(JSON.stringify({error}));
+                res.end(JSON.stringify({error: error.toString()}));
             }
         }
     };

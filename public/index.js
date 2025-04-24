@@ -1,40 +1,85 @@
-import { testCardIDInput, scannedCardInfoSection, loginForm, header, doorsSection } from "./components.js";
+import { TestCardIDInput, ScannedCardInfoSection, LoginForm, DoorsSection, Table } from "./components.js";
+import Router from "./router.js";
 
 const mainContainer = document.getElementById("app");
-const userStr = localStorage.getItem("user");
+const header = document.querySelector("header");
+const userStr = sessionStorage.getItem("user");
 const user = userStr ? JSON.parse(userStr) : null;
 
-const hbtn = document.getElementById("get-history");
+const historyBtn = document.getElementById("history-screen");
+historyBtn.addEventListener("click", () => {
+    console.log("navigate-to-history")
+    router.navigate("/history")
+});
 
-hbtn.addEventListener("click", () => {
-    fetch('/history')
+const monitorBtn = document.getElementById("monitor-screen");
+monitorBtn.addEventListener("click", () => {
+    console.log("navigate-to-home")
+    router.navigate("/")
+});
+
+const router = new Router({
+    home: { path: "/", renderer: renderMainScreen },
+    history: { path: "/history", renderer: renderHistoryScreen },
+    login: { path: "/login", renderer: renderLoginPage }
 })
 
 if (user?.uid) {
-    renderMainScreen();
+    router.navigate("/")
+    header.style.display = "flex";
 }
 else {
-    renderLoginPage();
+    router.navigate("/login")
+    header.style.display = "none";
+}
+
+const saveUserToStorage = (data) => {
+    sessionStorage.setItem("user", JSON.stringify({ uid: data.user.uid, email: data.user.email }));
+    header.style.display = "flex";
+}
+
+const removeUserFromStarge = () => {
+    sessionStorage.removeItem("user");
+    header.style.display = "none";
+}
+
+function handleLogin() {
+    const form = document.querySelector('#login-form>form');
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault(e);
+        const loginData = {}
+        const formData = new FormData(e.target);
+        for (const pair of formData.entries()) {
+            loginData[pair[0]] = pair[1]
+        }
+        const res = await fetch("/signin", { method: "POST", body: JSON.stringify(loginData) });
+        const data = await res.json();
+        if (data.user.uid) {
+            saveUserToStorage(data);
+            router.navigate("/")
+        }
+    })
 }
 
 function renderLoginPage() {
     mainContainer.innerHTML = "";
-    mainContainer.append(loginForm());
+    mainContainer.append(LoginForm());
     handleLogin();
 }
 
 
 function renderMainScreen() {
+    console.log("render-home")
     mainContainer.innerHTML = "";
     const contentContainer = document.createElement("div");
 
     const sectionLeft = document.createElement("div");
     sectionLeft.style.maxWidth = "20rem";
     const sectionRight = document.createElement("div");
-    sectionLeft.append(testCardIDInput(), doorsSection([0,0,0,0]), scannedCardInfoSection())
+    sectionLeft.append(TestCardIDInput(), DoorsSection([0, 0, 0, 0]), ScannedCardInfoSection())
 
     contentContainer.append(sectionLeft, sectionRight)
-    mainContainer.append(header(), contentContainer);
+    mainContainer.append(contentContainer);
 
 
     const scanedIdInput = document.querySelector("#test-card-id>input");
@@ -48,7 +93,7 @@ function renderMainScreen() {
             const cardIdValue = scanedIdInput.value;
             const res = await fetch(`/cardID/${cardIdValue}`);
             const { data } = await res.json();
-            const loginData = JSON.parse(localStorage.getItem("user"));
+            const loginData = JSON.parse(sessionStorage.getItem("user"));
             let accessData = null
             if (data === undefined || Object.keys(data).length === 0) {
                 userInfo.style.backgroundColor = "darkred";
@@ -73,7 +118,7 @@ function renderMainScreen() {
                 userInfo.style.backgroundColor = "darkgreen";
                 userInfo.innerText = `Aces permis pentru | ${data.name} | prin poarta | ${data.accessDoor} |.`;
             }
-            await fetch('/access-gate', { method: "POST", body: JSON.stringify(accessData) }) 
+            await fetch('/access-gate', { method: "POST", body: JSON.stringify(accessData) })
         }
         catch (error) {
             console.log(error)
@@ -86,8 +131,8 @@ function renderMainScreen() {
     logoutBtn.addEventListener("click", () => {
         fetch("/signout")
             .then(() => {
-                localStorage.removeItem("user");
-                renderLoginPage();
+                removeUserFromStarge()
+                router.navigate("/login")
             })
             .catch(error => {
                 console.log(error)
@@ -96,22 +141,34 @@ function renderMainScreen() {
     })
 }
 
-function handleLogin() {
-    const form = document.querySelector('#login-form>form');
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault(e);
-        const loginData = {}
-        const formData = new FormData(e.target);
-        for (const pair of formData.entries()) {
-            loginData[pair[0]] = pair[1]
+
+async function renderHistoryScreen() {
+    try {
+        console.log("render-history")
+        const historyTableCols = {
+            "Data": "time",
+            "Eroare": "error",
+            "Nume Utilizator": "name",
+            "Adresa Email Utilizator": "email",
+            "Ușă acces": "accessDoor",
+            "Serie Card Acces": "cardIdValue",
+            "Operator UID": "operatorUID",
+            "Operator Email": "operatorEmail"
         }
-        const res = await fetch("/signin", { method: "POST", body: JSON.stringify(loginData) });
-        const data = await res.json();
-        if (data.user.uid) {
-            localStorage.setItem("user", JSON.stringify({ uid: data.user.uid, email: data.user.email }));
-            renderMainScreen();
-        }
-    })
+
+        mainContainer.innerHTML = "";
+        const contentContainer = document.createElement("div");
+        const res = await fetch('/history');
+        const logs = await res.json();
+        console.log(logs)
+        const table = Table({head: historyTableCols, body: logs});
+        contentContainer.append(table);
+        mainContainer.append(contentContainer)
+    }
+    catch (error) {
+        alert(error.toString())
+    }
+
 }
 
 
@@ -121,8 +178,8 @@ function initPool() {
             const res = await fetch('/access-gate')
             const data = await res.json();
             const presentDoorsSection = document.getElementById("doors-section");
-            if(presentDoorsSection){
-                const doors = doorsSection(data.doors);
+            if (presentDoorsSection) {
+                const doors = DoorsSection(data.doors);
                 presentDoorsSection.replaceWith(doors);
             }
 
@@ -133,7 +190,7 @@ function initPool() {
     }, 500)
 }
 
-//initPool();
+initPool();
 
 
 

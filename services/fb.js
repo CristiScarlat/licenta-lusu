@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { getFirestore, doc, setDoc, addDoc, getDoc, updateDoc, deleteField, arrayUnion, arrayRemove } from "firebase/firestore";
+import { getFirestore, doc, setDoc, addDoc, getDoc, getDocs, updateDoc, deleteField, arrayUnion, arrayRemove, query, collection, limit, orderBy } from "firebase/firestore";
 import {firebaseConfig} from "./fb-credentials.js";
 
 const app = initializeApp(firebaseConfig);
@@ -47,9 +47,9 @@ export const getDataByCardID = async (cardId) => {
 
 export const addAccessDataToHistoryDB = async (data) => {
     try {
-        console.log(">>>>>>>", data)
-        const docsRef = doc(db, 'control-access-app', 'history');
-        return setDoc(docsRef, { [data.time]: data }, { merge: true });
+        console.log(data)
+        const docsRef = doc(db, 'control-access-app-logs', `${data.time}`);
+        return setDoc(docsRef, data);
         // return docSnap.get(cardId)
     }
     catch (error) {
@@ -58,14 +58,15 @@ export const addAccessDataToHistoryDB = async (data) => {
     }
 }
 
-export const getAccessDataToHistoryDB = async (data) => {
+export const getAccessDataFromHistoryDB = async (data) => {
     try {
-        const docsRef = doc(db, 'control-access-app', 'history');
-        const docSnap = await getDoc(docsRef);
-        return await docSnap.data();
+        const logs = [];
+        const q = query(collection(db, "control-access-app-logs"), orderBy("time", "desc"));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => logs.push(doc.data()));
+        return logs;
     }
     catch (error) {
-        console.log(error)
-        throw new Error("Could not read data from db")
+        throw new Error(error)
     }
 }

@@ -35,6 +35,8 @@ header {
     box-shadow: 1px 3px 11px black;
     display: flex;
     justify-content: flex-end;
+    gap: 1rem;
+    align-items: center;
 }
 
 .section {
@@ -99,4 +101,27 @@ header {
 svg {
     fill: white;
     width: 3rem;
+}
+
+table {
+    width: 100%;
+    background-color: #191919;
+}
+
+table td, th {
+    padding: 0.2rem;
+    border: 1px inset black;
+    text-align: center;
+}
+
+table tr.red {
+    background-color: darkred;
+}
+
+table tr.green {
+    background-color: darkgreen;
+}
+
+div:has(>table) {
+    padding: 1rem;
 }

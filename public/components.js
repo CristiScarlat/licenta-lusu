@@ -1,12 +1,4 @@
-export function header(){
-    const container = document.createElement("header");
-    container.innerHTML = `
-        <button id="logout-button">Logout</button>
-    `
-    return container;
-}
-
-export function testCardIDInput() {
+export function TestCardIDInput() {
     const container = document.createElement("div");
     container.className = "section";
     container.id = "test-card-id"
@@ -17,7 +9,7 @@ export function testCardIDInput() {
     return container;
 }
 
-export function scannedCardInfoSection(data) {
+export function ScannedCardInfoSection(data) {
     const container = document.createElement("div");
     container.className = "section";
     container.id = "users-access-display"
@@ -27,7 +19,7 @@ export function scannedCardInfoSection(data) {
     return container;
 }
 
-export function logsContainer(data) {
+export function LogsContainer(data) {
     const container = document.createElement("div");
     container.className = "section";
     container.id = "history-section"
@@ -37,7 +29,7 @@ export function logsContainer(data) {
     return container;
 }
 
-export function addUserFormSection(data) {
+export function AddUserFormSection(data) {
     const container = document.createElement("div");
     container.className = "section";
     container.id = "register-user"
@@ -71,7 +63,7 @@ export function addUserFormSection(data) {
     return container;
 }
 
-export function loginForm() {
+export function LoginForm() {
     const container = document.createElement("div");
     container.className = "section";
     container.id = "login-form"
@@ -94,7 +86,7 @@ export function loginForm() {
 
 }
 
-export function closedDoorIcon() {
+export function ClosedDoorIcon() {
     const container = document.createElement("div");
     container.className = "";
     container.id = "closed-door";
@@ -102,7 +94,7 @@ export function closedDoorIcon() {
     return container;
 }
 
-export function openDoorIcon() {
+export function OpenDoorIcon() {
     const container = document.createElement("div");
     container.className = "";
     container.id = "closed-door";
@@ -110,12 +102,49 @@ export function openDoorIcon() {
     return container;
 }
 
-export function doorsSection(doorsArray){
+export function DoorsSection(doorsArray) {
     const container = document.createElement("div");
     container.className = "section";
     container.id = "doors-section";
     doorsArray.forEach(door => {
-        door ? container.append(openDoorIcon()) : container.append(closedDoorIcon());
+        door ? container.append(OpenDoorIcon()) : container.append(ClosedDoorIcon());
     });
     return container;
+}
+
+export function Table(tableData) {
+    const table = document.createElement("table");
+
+    const tableHead = document.createElement("thead");
+    const tableBody = document.createElement("tbody");
+
+    console.log(tableData.body)
+    tableHead.innerHTML = `
+        <tr>
+        ${Object.keys(tableData.head).map(col => `<th>${col}</th>`).join("")}
+        </tr>
+    `
+
+    tableBody.innerHTML = tableData.body.map(obj => {
+        return(
+        `<tr class=${obj["error"] === null ? "green" : "red"}>
+        ${Object.keys(tableData.head).map(col => `<td>${obj[tableData.head[col]] ? col === "Data" ? formatDate(obj[tableData.head[col]]) : obj[tableData.head[col]] : "-"}</td>`).join("")}
+        </tr>`
+    )
+    }).join("")
+
+    table.append(tableHead, tableBody);
+    return table
+}
+
+function formatDate(unixtime) {
+    const months = ["ianuarie", "februarie", "martie", "aprilie", "mai", "iunie", "iulie", "august", "septembrie", "octombrie", "noiembrie", "decembrie"]
+    const date = new Date(unixtime);
+    const day = date.getDate();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    
+    return `${day}/${months[month]}/${year} ${hours < 10 ? "0" + hours : hours}:${minutes < 10 ? "0" + minutes : minutes}`
 }
