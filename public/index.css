@@ -52,6 +52,15 @@ header>nav>button.current{
     border-radius: 5px;
 }
 
+#manual-doors-section {
+    display: flex;
+    justify-content: space-between;
+}
+
+#manual-doors-section>button{
+    padding: 1rem;
+}
+
 #register-user form{
     border: 1px solid gray;
     border-radius: 5px;

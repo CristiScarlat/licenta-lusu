@@ -112,6 +112,18 @@ export function DoorsSection(doorsArray) {
     return container;
 }
 
+export function ManualDoorsSection(doorsArray) {
+    const container = document.createElement("div");
+    container.className = "section";
+    container.id = "manual-doors-section";
+    doorsArray.forEach((door, index) => {
+        const btn = document.createElement("button");
+        btn.innerText = index;
+        container.append(btn)
+    });
+    return container;
+}
+
 export function Table(tableData) {
     const table = document.createElement("table");
 

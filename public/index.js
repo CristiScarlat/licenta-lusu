@@ -1,4 +1,4 @@
-import { TestCardIDInput, ScannedCardInfoSection, LoginForm, DoorsSection, Table } from "./components.js";
+import { TestCardIDInput, ScannedCardInfoSection, LoginForm, DoorsSection, Table, ManualDoorsSection } from "./components.js";
 import Router from "./router.js";
 
 const mainContainer = document.getElementById("app");
@@ -87,7 +87,7 @@ function renderMainScreen() {
     const sectionLeft = document.createElement("div");
     sectionLeft.style.maxWidth = "20rem";
     const sectionRight = document.createElement("div");
-    sectionLeft.append(TestCardIDInput(), DoorsSection([0, 0, 0, 0]), ScannedCardInfoSection())
+    sectionLeft.append(TestCardIDInput(), DoorsSection([0, 0, 0, 0]), ManualDoorsSection([0, 0, 0, 0]), ScannedCardInfoSection())
 
     contentContainer.append(sectionLeft, sectionRight)
     mainContainer.append(contentContainer);
