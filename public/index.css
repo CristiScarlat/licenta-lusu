@@ -34,9 +34,14 @@ header {
     padding: 1rem;
     box-shadow: 1px 3px 11px black;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 1rem;
     align-items: center;
+}
+
+header>nav>button.current{
+    background-color: darkred;
+    color: white;
 }
 
 .section {

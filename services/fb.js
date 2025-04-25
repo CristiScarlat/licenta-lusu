@@ -11,7 +11,6 @@ export const registerUser = async (email, password) => {
     try {
         return await createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
-        console.log(error);
         throw new Error("Cannot create user");
     }
 }
@@ -28,7 +27,6 @@ export const logout = async () => {
     try {
         await signOut(auth);
     } catch (error) {
-        console.log(error);
         throw new Error("Cannot logout");
     }
 }
@@ -40,20 +38,17 @@ export const getDataByCardID = async (cardId) => {
         return docSnap.get(cardId)
     }
     catch (error) {
-        console.log(error)
         throw new Error("Could not read data from db")
     }
 }
 
 export const addAccessDataToHistoryDB = async (data) => {
     try {
-        console.log(data)
         const docsRef = doc(db, 'control-access-app-logs', `${data.time}`);
         return setDoc(docsRef, data);
         // return docSnap.get(cardId)
     }
     catch (error) {
-        console.log(error)
         throw new Error("Could not read data from db")
     }
 }

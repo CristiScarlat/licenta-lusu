@@ -8,21 +8,33 @@ const user = userStr ? JSON.parse(userStr) : null;
 
 const historyBtn = document.getElementById("history-screen");
 historyBtn.addEventListener("click", () => {
-    console.log("navigate-to-history")
     router.navigate("/history")
 });
 
 const monitorBtn = document.getElementById("monitor-screen");
 monitorBtn.addEventListener("click", () => {
-    console.log("navigate-to-home")
     router.navigate("/")
 });
+
+const onNavigate = (path) => {
+    console.log("on-navigate", path)
+    switch(path){
+        case "/":
+            monitorBtn.classList.add("current");
+            historyBtn.classList.remove("current");
+            break;
+        case "/history":
+            monitorBtn.classList.remove("current");
+            historyBtn.classList.add("current");
+            break;
+    }
+}
 
 const router = new Router({
     home: { path: "/", renderer: renderMainScreen },
     history: { path: "/history", renderer: renderHistoryScreen },
     login: { path: "/login", renderer: renderLoginPage }
-})
+}, onNavigate)
 
 if (user?.uid) {
     router.navigate("/")
@@ -38,7 +50,7 @@ const saveUserToStorage = (data) => {
     header.style.display = "flex";
 }
 
-const removeUserFromStarge = () => {
+const removeUserFromStorage = () => {
     sessionStorage.removeItem("user");
     header.style.display = "none";
 }
@@ -69,7 +81,6 @@ function renderLoginPage() {
 
 
 function renderMainScreen() {
-    console.log("render-home")
     mainContainer.innerHTML = "";
     const contentContainer = document.createElement("div");
 
@@ -131,7 +142,7 @@ function renderMainScreen() {
     logoutBtn.addEventListener("click", () => {
         fetch("/signout")
             .then(() => {
-                removeUserFromStarge()
+                removeUserFromStorage()
                 router.navigate("/login")
             })
             .catch(error => {
@@ -144,7 +155,6 @@ function renderMainScreen() {
 
 async function renderHistoryScreen() {
     try {
-        console.log("render-history")
         const historyTableCols = {
             "Data": "time",
             "Eroare": "error",
@@ -160,7 +170,6 @@ async function renderHistoryScreen() {
         const contentContainer = document.createElement("div");
         const res = await fetch('/history');
         const logs = await res.json();
-        console.log(logs)
         const table = Table({head: historyTableCols, body: logs});
         contentContainer.append(table);
         mainContainer.append(contentContainer)
