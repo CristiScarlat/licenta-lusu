@@ -135,7 +135,7 @@ export function addUserForm() {
             <input type="number" name="accessDoor" min="1" max="4" value="1"/>
         </div>
         <div>
-            <label>ID card acces</label>if()
+            <label>ID card acces</label>
             <input type="text" name="cardID"/>
         </div>
         <div>
