@@ -45,11 +45,18 @@ header>nav>button.current{
 }
 
 .section {
+    position: relative;
     border: 1px inset black;
     width: 100%;
-    padding: 1rem;
+    padding: 2rem 1rem;
     margin: 1rem;
     border-radius: 5px;
+}
+
+.section>label{
+    position: absolute;
+    top: 5px;
+    left: 5px;
 }
 
 #manual-doors-section {
@@ -61,14 +68,14 @@ header>nav>button.current{
     padding: 1rem;
 }
 
-#register-user form{
+form{
     border: 1px solid gray;
     border-radius: 5px;
     padding: 0.5rem;
     margin-top: 0.5rem;
 }
 
-#register-user form>div{
+form>div{
     display: flex;
     justify-content: space-between;
     gap: 0.5rem;

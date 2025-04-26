@@ -170,6 +170,21 @@ function runWebserver() {
                 res.end(JSON.stringify({error: error.toString()}));
             }
         }
+        else if (req.method === "POST" && req.url === "/register-member") {
+            try {
+                const {name, email, accessDoor} = await getReqBody(req);
+                console.log({name, email, accessDoor})
+                res.setHeader("Content-Type", "application/json");
+                res.writeHead(200);
+                res.end(JSON.stringify({ data: {name, email, accessDoor} }));
+            }
+            catch (error) {
+                console.log(error)
+                res.setHeader("Content-Type", "application/json");
+                res.writeHead(500);
+                res.end(JSON.stringify(error));
+            }
+        }
     };
 
     const server = http.createServer(requestListener);

@@ -13,9 +13,7 @@ export function ScannedCardInfoSection(data) {
     const container = document.createElement("div");
     container.className = "section";
     container.id = "users-access-display"
-    container.innerHTML = `
-        
-    `
+    container.innerHTML = "<label>Informații card scanat</label>"
     return container;
 }
 
@@ -25,40 +23,6 @@ export function LogsContainer(data) {
     container.id = "history-section"
     container.innerHTML = `
         
-    `
-    return container;
-}
-
-export function AddUserFormSection(data) {
-    const container = document.createElement("div");
-    container.className = "section";
-    container.id = "register-user"
-    container.innerHTML = `
-    <label>Adaugă un nou utilizator</label>
-    <form>
-        <div>
-            <label>Nume și prenume</label>
-            <input />
-        </div>
-        <div>
-            <label>Email</label>
-            <input type="email"/>
-        </div>
-        <div>
-            <label>Serie și număr CI</label>
-            <input />
-        </div>
-        <div>
-            <label>Poartă acces</label>
-            <select>
-                <option value="0">Poarta 1</option>
-                <option value="1">Poarta 2</option>
-                <option value="2">Poarta 3</option>
-                <option value="3">Poarta 4</option>
-            </select>
-        </div>
-        <button type="submit">Salvează</button>
-    </form>
     `
     return container;
 }
@@ -106,6 +70,7 @@ export function DoorsSection(doorsArray) {
     const container = document.createElement("div");
     container.className = "section";
     container.id = "doors-section";
+    container.innerHTML = "<label>Monitorizare uși acces</label>"
     doorsArray.forEach(door => {
         door ? container.append(OpenDoorIcon()) : container.append(ClosedDoorIcon());
     });
@@ -116,9 +81,10 @@ export function ManualDoorsSection(doorsArray) {
     const container = document.createElement("div");
     container.className = "section";
     container.id = "manual-doors-section";
+    container.innerHTML = "<label>Acționare manuală uși acces</label>"
     doorsArray.forEach((door, index) => {
         const btn = document.createElement("button");
-        btn.innerText = index;
+        btn.innerText = index+1;
         container.append(btn)
     });
     return container;
@@ -147,6 +113,37 @@ export function Table(tableData) {
 
     table.append(tableHead, tableBody);
     return table
+}
+
+export function addUserForm() {
+    const container = document.createElement("div");
+    container.className = "section";
+    container.id = "add-user-form"
+    container.innerHTML = `
+    <label>Adaugă membru nou</label>
+    <form>
+        <div>
+            <label>Nume și Prenume</label>
+            <input type="email" name="name"/>
+        </div>
+        <div>
+            <label>Email</label>
+            <input type="email" name="email"/>
+        </div>
+        <div>
+            <label>Ușă acces</label>
+            <input type="number" name="accessDoor" min="1" max="4" value="1"/>
+        </div>
+        <div>
+            <label>ID card acces</label>if()
+            <input type="text" name="cardID"/>
+        </div>
+        <div>
+            <button type="submit">Salvează</button>
+        </div>
+    </form>
+    `
+    return container;
 }
 
 function formatDate(unixtime) {
