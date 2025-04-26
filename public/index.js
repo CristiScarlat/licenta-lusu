@@ -16,16 +16,28 @@ monitorBtn.addEventListener("click", () => {
     router.navigate("/")
 });
 
+const adminBtn = document.getElementById("admin-screen");
+adminBtn.addEventListener("click", () => {
+    router.navigate("/admin")
+});
+
 const onNavigate = (path) => {
     console.log("on-navigate", path)
     switch(path){
         case "/":
             monitorBtn.classList.add("current");
             historyBtn.classList.remove("current");
+            adminBtn.classList.remove("current");
             break;
         case "/history":
-            monitorBtn.classList.remove("current");
             historyBtn.classList.add("current");
+            monitorBtn.classList.remove("current");
+            adminBtn.classList.remove("current");
+            break;
+        case "/admin":
+            adminBtn.classList.add("current");
+            monitorBtn.classList.remove("current");
+            historyBtn.classList.remove("current");
             break;
     }
 }
@@ -33,6 +45,7 @@ const onNavigate = (path) => {
 const router = new Router({
     home: { path: "/", renderer: renderMainScreen },
     history: { path: "/history", renderer: renderHistoryScreen },
+    admin: { path: "/admin", renderer: renderAdminPage },
     login: { path: "/login", renderer: renderLoginPage }
 }, onNavigate)
 
@@ -73,6 +86,11 @@ function handleLogin() {
     })
 }
 
+function renderAdminPage() {
+    mainContainer.innerHTML = "";
+    mainContainer.append(addUserForm());
+}
+
 function renderLoginPage() {
     mainContainer.innerHTML = "";
     mainContainer.append(LoginForm());
@@ -87,7 +105,7 @@ function renderMainScreen() {
     const sectionLeft = document.createElement("div");
     sectionLeft.style.maxWidth = "20rem";
     const sectionRight = document.createElement("div");
-    sectionLeft.append(TestCardIDInput(), addUserForm(), DoorsSection([0, 0, 0, 0]), ManualDoorsSection([0, 0, 0, 0]), ScannedCardInfoSection())
+    sectionLeft.append(TestCardIDInput(), DoorsSection([0, 0, 0, 0]), ManualDoorsSection([0, 0, 0, 0]), ScannedCardInfoSection())
 
     contentContainer.append(sectionLeft, sectionRight)
     mainContainer.append(contentContainer);

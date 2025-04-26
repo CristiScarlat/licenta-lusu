@@ -59,6 +59,10 @@ header>nav>button.current{
     left: 5px;
 }
 
+#add-user-form {
+    max-width: 20rem;
+}
+
 #manual-doors-section {
     display: flex;
     justify-content: space-between;
