@@ -115,7 +115,18 @@ function renderMainScreen() {
     const scanedIdButtn = document.querySelector("#test-card-id>button");
     const userInfo = document.querySelector("#users-access-display");
     const logoutBtn = document.getElementById("logout-button");
+    const manualBtns = document.querySelectorAll("#manual-doors-section button")
 
+    manualBtns.forEach(button => {
+        button.addEventListener("click", async() => {
+            try{
+                await fetch('/access-gate', { method: "POST", body: JSON.stringify({accessDoor: button.innerText}) })
+            }
+            catch(error){
+            alert("Ușa nu poate fi acționată manual!")
+            }
+        })
+    })
 
     const fetchCardData = async () => {
         try {
@@ -152,7 +163,6 @@ function renderMainScreen() {
         catch (error) {
             console.log(error)
         }
-
     }
 
     scanedIdButtn.addEventListener("click", fetchCardData)
