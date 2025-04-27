@@ -45,11 +45,11 @@ export const getDataByCardID = async (cardId) => {
 export const addAccessDataToHistoryDB = async (data) => {
     try {
         const docsRef = doc(db, 'control-access-app-logs', `${data.time}`);
+        console.log(data)
         return setDoc(docsRef, data);
-        // return docSnap.get(cardId)
     }
     catch (error) {
-        throw new Error("Could not read data from db")
+        throw new Error("Could not write data from db")
     }
 }
 
@@ -62,6 +62,6 @@ export const getAccessDataFromHistoryDB = async (data) => {
         return logs;
     }
     catch (error) {
-        throw new Error(error)
+        throw new Error("Could not read data from db")
     }
 }

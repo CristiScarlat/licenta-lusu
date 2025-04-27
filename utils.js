@@ -18,6 +18,8 @@ export function getReqBody(req) {
 
 const timerId = null;
 
-export function openDoorWithTimer(doorNo) {
-    
+export function formatRFID(rfid) {
+    if(rfid.includes("[")){
+        return JSON.parse(rfid).join("");
+    }
 }

@@ -5,8 +5,8 @@ import url from 'url';
 // import { toggleRelay, getRelaysState } from "./gpio.js";
 // import { saveSchedule } from "./scheduleHandler.js";
 import { getDataByCardID, login, logout, addAccessDataToHistoryDB, getAccessDataFromHistoryDB } from "./services/fb.js";
-import { getReqBody } from "./utils.js";
-import { openDoorWithTimer, getRelaysState } from './services/rpi.js';
+import { getReqBody, formatRFID } from "./utils.js";
+import { openDoorWithTimer, getRelaysState, initRFID } from './services/rpi.js';
 
 function runWebserver() {
     const host = 'localhost';
@@ -185,6 +185,20 @@ function runWebserver() {
                 res.end(JSON.stringify(error));
             }
         }
+        else if (req.method === "GET" && req.url === "/register-member") {
+            try {
+                const data = await readRFIDwithTimeout()
+                res.setHeader("Content-Type", "application/json");
+                res.writeHead(200);
+                res.end(JSON.stringify({ data }));
+            }
+            catch (error) {
+                console.log(error)
+                res.setHeader("Content-Type", "application/json");
+                res.writeHead(500);
+                res.end(JSON.stringify(error));
+            }
+        }
     };
 
     const server = http.createServer(requestListener);
@@ -193,5 +207,27 @@ function runWebserver() {
         open(`http://${host}:${port}`, { app: ['google chrome', '--kiosk'] });
     });
 }
+
+    let throttleId = null;
+async function handleAccessByScannedRFID(error, rfid) {
+    if(throttleId)return;
+    throttleId = setTimeout(async () => {
+            try{
+                if(error === null){
+                    const cardId = formatRFID(rfid)
+                    const data = await getDataByCardID(cardId);
+                } else throw error;
+            } 
+            catch(error){
+                console.log(">>>>>>>>>>>", error)
+                await addAccessDataToHistoryDB({time: Date.now(),error: "Card neînregistrat, accesul nu este permis!"});
+            }
+            clearTimeout(throttleId)
+            throttleId = null;
+    }, 3000)
+
+}
+
+initRFID(handleAccessByScannedRFID)
 
 runWebserver()
