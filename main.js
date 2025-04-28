@@ -6,7 +6,7 @@ import url from 'url';
 // import { saveSchedule } from "./scheduleHandler.js";
 import { getDataByCardID, login, logout, addAccessDataToHistoryDB, getAccessDataFromHistoryDB } from "./services/fb.js";
 import { getReqBody, formatRFID } from "./utils.js";
-import { openDoorWithTimer, getRelaysState, initRFID } from './services/rpi.js';
+import { openDoorWithTimer, getRelaysState, initRFID, readRFIDwithTimeout } from './services/rpi.js';
 
 function runWebserver() {
     const host = 'localhost';
@@ -185,12 +185,13 @@ function runWebserver() {
                 res.end(JSON.stringify(error));
             }
         }
-        else if (req.method === "GET" && req.url === "/register-member") {
+        else if (req.method === "GET" && req.url === "/scan-card") {
             try {
-                const data = await readRFIDwithTimeout()
+                const data = await readRFIDwithTimeout();
+                const cardId = formatRFID(data);
                 res.setHeader("Content-Type", "application/json");
                 res.writeHead(200);
-                res.end(JSON.stringify({ data }));
+                res.end(JSON.stringify({ cardId }));
             }
             catch (error) {
                 console.log(error)
@@ -208,7 +209,7 @@ function runWebserver() {
     });
 }
 
-    let throttleId = null;
+let throttleId = null;
 async function handleAccessByScannedRFID(error, rfid) {
     if(throttleId)return;
     throttleId = setTimeout(async () => {
@@ -219,7 +220,6 @@ async function handleAccessByScannedRFID(error, rfid) {
                 } else throw error;
             } 
             catch(error){
-                console.log(">>>>>>>>>>>", error)
                 await addAccessDataToHistoryDB({time: Date.now(),error: "Card neînregistrat, accesul nu este permis!"});
             }
             clearTimeout(throttleId)

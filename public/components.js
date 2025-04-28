@@ -136,7 +136,10 @@ export function addUserForm() {
         </div>
         <div>
             <label>ID card acces</label>
-            <input type="text" name="cardID"/>
+            <div>
+                <input type="text" name="cardID"/>
+                <button class="scan-btn">Scaneaza card</button>
+            </div>
         </div>
         <div>
             <button type="submit">Salvează</button>

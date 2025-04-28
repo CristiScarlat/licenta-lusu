@@ -1,6 +1,8 @@
 import { TestCardIDInput, ScannedCardInfoSection, LoginForm, DoorsSection, Table, ManualDoorsSection, addUserForm } from "./components.js";
 import Router from "./router.js";
 
+let tickPool = null;
+
 const mainContainer = document.getElementById("app");
 const header = document.querySelector("header");
 const userStr = sessionStorage.getItem("user");
@@ -87,8 +89,22 @@ function handleLogin() {
 }
 
 function renderAdminPage() {
+    clearInterval(tickPool);
     mainContainer.innerHTML = "";
     mainContainer.append(addUserForm());
+    const scanBtn = document.querySelector("#add-user-form .scan-btn");
+    scanBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        try{
+            const res = await fetch("/scan-card");
+            const data = await res.json();
+            const cardIdInput = document.querySelector('#add-user-form input[name="cardID"]');
+            cardIdInput.value = data.cardId;
+        } 
+        catch(error){
+            conosle.log(error)
+        }
+    })
 }
 
 function renderLoginPage() {
@@ -98,7 +114,9 @@ function renderLoginPage() {
 }
 
 
+
 function renderMainScreen() {
+    tickPool = initPool();
     mainContainer.innerHTML = "";
     const contentContainer = document.createElement("div");
 
@@ -210,7 +228,7 @@ async function renderHistoryScreen() {
 
 
 function initPool() {
-    setInterval(async () => {
+    return setInterval(async () => {
         try {
             const res = await fetch('/access-gate')
             const data = await res.json();
@@ -227,7 +245,7 @@ function initPool() {
     }, 500)
 }
 
-initPool();
+
 
 
 

@@ -19,12 +19,13 @@ export function getRelaysState(){
 
 export function initRFID(cb){
     console.log("init rfid scanner...")
-	setInterval(() => rfid.read(cb), 3000);	
+	return setInterval(() => rfid.read(cb), 3000);	
 }
 
 export function readRFIDwithTimeout() {
     return new Promise((resolve, reject) => {
         rfid.readintime(5000, (error, result) => {
+            console.log({error, result})
             if(error)reject(error)
             else if(!result.includes("["))reject(error)
             else resolve(result)
