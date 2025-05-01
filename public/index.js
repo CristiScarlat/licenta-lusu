@@ -102,7 +102,26 @@ function renderAdminPage() {
             cardIdInput.value = data.cardId;
         } 
         catch(error){
-            conosle.log(error)
+            console.log(error)
+        }
+    });
+    
+    const addPersonForm = document.querySelector("#add-user-form form");
+    addPersonForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target); 
+        const name = formData.get("name");
+        const email = formData.get("email"); 
+        const accessDoor = formData.get("accessDoor"); 
+        const cardId = formData.get("cardID"); 
+        try{
+            const res = await fetch("/register-member", {method: "POST", body: JSON.stringify({name, email, accessDoor, cardId})});
+            const data = await res.json();
+            alert("Membru salvat cu succes.");
+        } 
+        catch(error){
+            console.log(error);
+            alert("A aparut o eroare!");
         }
     })
 }
@@ -223,7 +242,7 @@ async function renderHistoryScreen() {
     catch (error) {
         alert(error.toString())
     }
-
+b
 }
 
 

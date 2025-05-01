@@ -4,7 +4,7 @@ import { getFirestore, doc, setDoc, addDoc, getDoc, getDocs, updateDoc, deleteFi
 import {firebaseConfig} from "./fb-credentials.js";
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+export const auth = getAuth(app);
 const db = getFirestore(app);
 
 export const registerUser = async (email, password) => {
@@ -36,6 +36,17 @@ export const getDataByCardID = async (cardId) => {
         const docsRef = doc(db, 'control-access-app', 'persons');
         const docSnap = await getDoc(docsRef);
         return docSnap.get(cardId)
+    }
+    catch (error) {
+        throw new Error("Could not read data from db")
+    }
+}
+
+export const addPersonToDBwithCardId = async (data) => {
+    try {
+        const docsRef = doc(db, 'control-access-app', 'persons');
+        return await setDoc(docsRef, {[data.cardId]: data}, {merge: true});
+    
     }
     catch (error) {
         throw new Error("Could not read data from db")

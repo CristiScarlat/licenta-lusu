@@ -124,20 +124,20 @@ export function addUserForm() {
     <form>
         <div>
             <label>Nume și Prenume</label>
-            <input type="email" name="name"/>
+            <input type="text" name="name" required/>
         </div>
         <div>
             <label>Email</label>
-            <input type="email" name="email"/>
+            <input type="email" name="email" required/>
         </div>
         <div>
             <label>Ușă acces</label>
-            <input type="number" name="accessDoor" min="1" max="4" value="1"/>
+            <input type="number" name="accessDoor" min="1" max="4" value="1" required/>
         </div>
         <div>
             <label>ID card acces</label>
             <div>
-                <input type="text" name="cardID"/>
+                <input type="text" name="cardID" required/>
                 <button class="scan-btn">Scaneaza card</button>
             </div>
         </div>

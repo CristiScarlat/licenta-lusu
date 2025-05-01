@@ -4,7 +4,7 @@ import fs, { access } from 'fs';
 import url from 'url';
 // import { toggleRelay, getRelaysState } from "./gpio.js";
 // import { saveSchedule } from "./scheduleHandler.js";
-import { getDataByCardID, login, logout, addAccessDataToHistoryDB, getAccessDataFromHistoryDB } from "./services/fb.js";
+import { getDataByCardID, login, logout, addAccessDataToHistoryDB, getAccessDataFromHistoryDB, addPersonToDBwithCardId, auth } from "./services/fb.js";
 import { getReqBody, formatRFID } from "./utils.js";
 import { openDoorWithTimer, getRelaysState, initRFID, readRFIDwithTimeout } from './services/rpi.js';
 
@@ -172,11 +172,12 @@ function runWebserver() {
         }
         else if (req.method === "POST" && req.url === "/register-member") {
             try {
-                const {name, email, accessDoor} = await getReqBody(req);
-                console.log({name, email, accessDoor})
+                const data = await getReqBody(req);
+                console.log(data)
+                await addPersonToDBwithCardId(data);
                 res.setHeader("Content-Type", "application/json");
                 res.writeHead(200);
-                res.end(JSON.stringify({ data: {name, email, accessDoor} }));
+                res.end(JSON.stringify({ data, status: "success" }));
             }
             catch (error) {
                 console.log(error)
@@ -205,7 +206,7 @@ function runWebserver() {
     const server = http.createServer(requestListener);
     server.listen(port, host, () => {
         console.log(`Server is running on http://${host}:${port}`);
-        open(`http://${host}:${port}`, { app: ['google chrome', '--kiosk'] });
+        open(`http://${host}:${port}`, { app: ['chromium-browser', '--kiosk'] });
     });
 }
 
@@ -216,15 +217,30 @@ async function handleAccessByScannedRFID(error, rfid) {
             try{
                 if(error === null){
                     const cardId = formatRFID(rfid)
+                    console.log(cardId)
                     const data = await getDataByCardID(cardId);
+                    console.log(data)
+                    openDoorWithTimer(data.accessDoor);
+                    const historyData = {
+                            error: null,
+                            name: data.name,
+                            email: data.email,
+                            accessDoor: data.accessDoor,
+                            cardIdValue: data.cardId,
+                            operatorEmail: auth.currentUser?.email || null,
+                            operatorUID: auth.currentUser?.uid || null,
+                            time: Date.now()
+                    }
+                    await addAccessDataToHistoryDB(historyData);
                 } else throw error;
             } 
             catch(error){
-                await addAccessDataToHistoryDB({time: Date.now(),error: "Card neînregistrat, accesul nu este permis!"});
+                console.log(error)
+                await addAccessDataToHistoryDB({time: Date.now(), error: "Card neînregistrat, accesul nu este permis!"});
             }
             clearTimeout(throttleId)
             throttleId = null;
-    }, 3000)
+    }, 1000)
 
 }
 

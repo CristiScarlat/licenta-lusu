@@ -60,7 +60,8 @@ header>nav>button.current{
 }
 
 #add-user-form {
-    max-width: 20rem;
+    max-width: 30rem;
+    margin: 3rem auto;
 }
 
 #manual-doors-section {

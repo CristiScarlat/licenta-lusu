@@ -12,6 +12,7 @@
   "dependencies": {
     "firebase": "^11.5.0",
     "node-rfid": "^1.0.7",
+    "onoff": "^6.0.3",
     "open": "^10.1.0"
   }
 }
