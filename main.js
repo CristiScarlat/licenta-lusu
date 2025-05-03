@@ -85,21 +85,6 @@ function runWebserver() {
                 res.end(data);
             })
         }
-        else if (req.method === "GET" && req.url.includes("/cardID")) {
-            try {
-                const cardId = req.url.split("/").pop()
-                const data = await getDataByCardID(cardId);
-                res.setHeader("Content-Type", "application/json");
-                res.writeHead(200);
-                res.end(JSON.stringify({ data }));
-            }
-            catch (error) {
-                console.log(error)
-                res.setHeader("Content-Type", "application/json");
-                res.writeHead(500);
-                res.end(JSON.stringify({ error: JSON.stringify(error) }));
-            }
-        }
         else if (req.method === "POST" && req.url === "/signin") {
             try {
                 const {email, password} = await getReqBody(req);

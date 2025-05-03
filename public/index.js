@@ -165,45 +165,6 @@ function renderMainScreen() {
         })
     })
 
-    const fetchCardData = async () => {
-        try {
-            const cardIdValue = scanedIdInput.value;
-            const res = await fetch(`/cardID/${cardIdValue}`);
-            const { data } = await res.json();
-            const loginData = JSON.parse(sessionStorage.getItem("user"));
-            let accessData = null
-            if (data === undefined || Object.keys(data).length === 0) {
-                userInfo.style.backgroundColor = "darkred";
-                userInfo.innerText = "Card neînregistrat, accesul nu este permis!";
-                accessData = {
-                    cardIdValue,
-                    error: "Card neînregistrat, accesul nu este permis!",
-                    operatorEmail: loginData.email,
-                    operatorUID: loginData.uid,
-                    time: Date.now()
-                }
-            }
-            else {
-                accessData = {
-                    ...data,
-                    cardIdValue,
-                    error: null,
-                    operatorEmail: loginData.email,
-                    operatorUID: loginData.uid,
-                    time: Date.now()
-                }
-                userInfo.style.backgroundColor = "darkgreen";
-                userInfo.innerText = `Aces permis pentru | ${data.name} | prin poarta | ${data.accessDoor} |.`;
-            }
-            await fetch('/access-gate', { method: "POST", body: JSON.stringify(accessData) })
-        }
-        catch (error) {
-            console.log(error)
-        }
-    }
-
-    scanedIdButtn.addEventListener("click", fetchCardData)
-
     logoutBtn.addEventListener("click", () => {
         fetch("/signout")
             .then(() => {
