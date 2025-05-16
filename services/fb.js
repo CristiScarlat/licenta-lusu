@@ -71,11 +71,15 @@ let currentPageIndex = 0;
 
 export const getAccessDataFromHistoryDB = async (
   pageLimit = 10,
-  direction = "next"
+  direction
 ) => {
   try {
+    if(direction === undefined){
+        currentPageIndex = 0;
+        cursors = [null];
+    }  
     const logs = [];
-
+        
     if (direction === "next") {
       currentPageIndex++;
       if (cursors.length <= currentPageIndex) cursors.push(null); // reserve space

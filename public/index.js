@@ -142,14 +142,11 @@ function renderMainScreen() {
     const sectionLeft = document.createElement("div");
     sectionLeft.style.maxWidth = "20rem";
     const sectionRight = document.createElement("div");
-    sectionLeft.append(TestCardIDInput(), DoorsSection([0, 0, 0, 0]), ManualDoorsSection([0, 0, 0, 0]), ScannedCardInfoSection())
+    sectionLeft.append(DoorsSection([0, 0, 0, 0]), ManualDoorsSection([0, 0, 0, 0]), ScannedCardInfoSection())
 
     contentContainer.append(sectionLeft, sectionRight)
     mainContainer.append(contentContainer);
 
-
-    const scanedIdInput = document.querySelector("#test-card-id>input");
-    const scanedIdButtn = document.querySelector("#test-card-id>button");
     const userInfo = document.querySelector("#users-access-display");
     const logoutBtn = document.getElementById("logout-button");
     const manualBtns = document.querySelectorAll("#manual-doors-section button")
@@ -237,10 +234,24 @@ function initPool() {
         try {
             const res = await fetch('/access-gate')
             const data = await res.json();
+            console.log(data.persons)
             const presentDoorsSection = document.getElementById("doors-section");
+            const currentPersonAccess = document.getElementById("users-access-display");
             if (presentDoorsSection) {
                 const doors = DoorsSection(data.doors);
                 presentDoorsSection.replaceWith(doors);
+            }
+            if(currentPersonAccess){
+                currentPersonAccess.innerHTML = "<label>Informații card scanat</label>";
+               data.persons.forEach(persInfo => {
+                   if(persInfo.name){
+                       const p = document.createElement("p");
+                       p.style = "background-color: darkgreen;color: white;padding: 1rem;";
+                       p.innerText = `${persInfo.name} are acces pe poarta ${persInfo.accessDoor}`;
+                       currentPersonAccess.append(p)
+                   }
+                   
+                })
             }
 
         }
@@ -249,6 +260,7 @@ function initPool() {
         }
     }, 500)
 }
+
 
 
 

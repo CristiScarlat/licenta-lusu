@@ -6,7 +6,7 @@ import url from 'url';
 // import { saveSchedule } from "./scheduleHandler.js";
 import { getDataByCardID, login, logout, addAccessDataToHistoryDB, getAccessDataFromHistoryDB, addPersonToDBwithCardId, auth } from "./services/fb.js";
 import { getReqBody, formatRFID } from "./utils.js";
-import { openDoorWithTimer, getRelaysState, initRFID, readRFIDwithTimeout } from './services/rpi.js';
+import { openDoorWithTimer, getRelaysState, getCurrentPers, initRFID, readRFIDwithTimeout } from './services/rpi.js';
 
 function runWebserver() {
     const host = '0.0.0.0';
@@ -113,11 +113,10 @@ function runWebserver() {
                 res.end(JSON.stringify(error));
             }
         }
-        else if (req.method === "POST" && req.url.includes(r)) {
+        else if (req.method === "POST" && req.url.includes("/access-gate")) {
             try {
                 const accessData = await getReqBody(req);
-                if(accessData?.accessDoor)openDoorWithTimer(accessData.accessDoor);
-                await addAccessDataToHistoryDB(accessData);
+                if(accessData?.accessDoor)openDoorWithTimer({accessDoor: accessData.accessDoor});
                 res.setHeader("Content-Type", "application/json");
                 res.writeHead(200);
                 res.end(JSON.stringify({ accessData }));
@@ -132,9 +131,10 @@ function runWebserver() {
         else if (req.method === "GET" && req.url.includes("/access-gate")) {
             try {
                 const relaysState = getRelaysState();
+                const persInfo = getCurrentPers();
                 res.setHeader("Content-Type", "application/json");
                 res.writeHead(200);
-                res.end(JSON.stringify({ doors:  relaysState}));
+                res.end(JSON.stringify({ doors:  relaysState, persons: persInfo}));
             }
             catch (error) {
                 res.setHeader("Content-Type", "application/json");
@@ -144,7 +144,7 @@ function runWebserver() {
         }
         else if (req.method === "GET" && req.url.includes("/history")) {
             try {
-                const direction = req.url.includes("?") ? req.url.split("?")[1]?.split("=")[1] : "prev";
+                const direction = req.url.split("?")[1]?.split("=")[1];
                 const pageQty = 15;
                 const logs = await getAccessDataFromHistoryDB(pageQty, direction);
                 res.setHeader("Content-Type", "application/json");
@@ -207,7 +207,7 @@ async function handleAccessByScannedRFID(error, rfid) {
                     console.log(cardId)
                     const data = await getDataByCardID(cardId);
                     console.log(data)
-                    openDoorWithTimer(data.accessDoor);
+                    openDoorWithTimer(data);
                     const historyData = {
                             error: null,
                             name: data.name,
@@ -231,6 +231,6 @@ async function handleAccessByScannedRFID(error, rfid) {
 
 }
 
-//initRFID(handleAccessByScannedRFID)
+initRFID(handleAccessByScannedRFID)
 
 runWebserver()

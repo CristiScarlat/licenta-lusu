@@ -158,3 +158,8 @@ div:has(>table) {
     gap: 1rem;
     justify-content: center;
 }
+
+#users-access-display {
+    display: flex;
+    flex-direction: column;
+}

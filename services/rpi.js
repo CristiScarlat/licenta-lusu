@@ -2,12 +2,16 @@ import rfid from "node-rfid"
 
 const timerIds = [];
 const relays = [0,0,0,0];
+const persInfo = [{}, {}, {}, {}]
 
-export function openDoorWithTimer(doorNo) {  
+export function openDoorWithTimer(data) { 
+    const doorNo = data.accessDoor 
     relays[doorNo-1] = 1;
+    persInfo[doorNo-1] = data;
     clearInterval(timerIds[doorNo-1])
     const timerId = setTimeout(() => {
         relays[doorNo-1] = 0;
+        persInfo[doorNo-1] = {};
         clearInterval(timerIds[doorNo-1])
     }, 5000)
     timerIds[doorNo-1] = timerId;
@@ -15,6 +19,10 @@ export function openDoorWithTimer(doorNo) {
 
 export function getRelaysState(){
     return relays;
+}
+
+export function getCurrentPers() {
+    return persInfo;
 }
 
 export function initRFID(cb){
