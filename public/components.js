@@ -96,7 +96,7 @@ export function Table(tableData) {
     const tableHead = document.createElement("thead");
     const tableBody = document.createElement("tbody");
 
-    console.log(tableData.body)
+    console.log(tableData?.body)
     tableHead.innerHTML = `
         <tr>
         ${Object.keys(tableData.head).map(col => `<th>${col}</th>`).join("")}

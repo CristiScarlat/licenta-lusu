@@ -217,6 +217,7 @@ function renderMainScreen() {
     })
 }
 
+let historyPage = 0;
 
 async function renderHistoryScreen() {
     try {
@@ -236,13 +237,33 @@ async function renderHistoryScreen() {
         const res = await fetch('/history');
         const logs = await res.json();
         const table = Table({head: historyTableCols, body: logs});
-        contentContainer.append(table);
-        mainContainer.append(contentContainer)
+        const pagination = document.createElement("div");
+        pagination.className="pagination-footer";
+        pagination.innerHTML = `
+            <button id="prev-btn">Pagina anterioară</button>
+            <button id="next-btn">Pagina următoare</button>
+        `
+        contentContainer.append(pagination, table);
+        mainContainer.append(contentContainer);
+        const prevPageBtn = document.getElementById("prev-btn");
+        const nextPageBtn = document.getElementById("next-btn");
+        prevPageBtn.addEventListener("click", () => {
+            if(historyPage > 0)historyPage--;
+            })
+        nextPageBtn.addEventListener("click", async () => {
+                historyPage++;
+                const res = await fetch('/history');
+                const logs = await res.json();
+                const tableObj = document.querySelector("table");
+                tableObj.remove();
+                const table = Table({head: historyTableCols, body: logs});
+                contentContainer.appendChild(table)
+            })    
+ 
     }
     catch (error) {
         alert(error.toString())
     }
-b
 }
 
 

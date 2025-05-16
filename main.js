@@ -9,7 +9,7 @@ import { getReqBody, formatRFID } from "./utils.js";
 import { openDoorWithTimer, getRelaysState, initRFID, readRFIDwithTimeout } from './services/rpi.js';
 
 function runWebserver() {
-    const host = 'localhost';
+    const host = '0.0.0.0';
     const port = 8000;
 
     const requestListener = async function (req, res) {
@@ -128,7 +128,7 @@ function runWebserver() {
                 res.end(JSON.stringify(error));
             }
         }
-        else if (req.method === "POST" && req.url.includes("/access-gate")) {
+        else if (req.method === "POST" && req.url.includes(r)) {
             try {
                 const accessData = await getReqBody(req);
                 if(accessData?.accessDoor)openDoorWithTimer(accessData.accessDoor);

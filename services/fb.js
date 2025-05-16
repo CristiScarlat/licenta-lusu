@@ -6,6 +6,7 @@ import {firebaseConfig} from "./fb-credentials.js";
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 const db = getFirestore(app);
+let lastVisible = null; 
 
 export const registerUser = async (email, password) => {
     try {
@@ -64,15 +65,29 @@ export const addAccessDataToHistoryDB = async (data) => {
     }
 }
 
-export const getAccessDataFromHistoryDB = async (data) => {
+
+export const getAccessDataFromHistoryDB = async (pageLimit=10, offset=0) => {
     try {
+        if(offset === 0)lastVisible = null;
         const logs = [];
-        const q = query(collection(db, "control-access-app-logs"), orderBy("time", "desc"));
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc) => logs.push(doc.data()));
+        let q = null;
+        if(lastVisible){
+            q = query(collection(db, "control-access-app-logs"),
+                orderBy("time", "desc"),
+                startAfter(lastVisible),
+                limit(pageLimit));
+        }
+        else {
+            q = query(collection(db, "control-access-app-logs"), orderBy("time", "desc"), limit(pageLimit));
+
+        }
+
+        const docSnap = await getDocs(q);
+        docSnap.forEach((doc) => logs.push(doc.data()));
         return logs;
     }
     catch (error) {
+        console.log(error)
         throw new Error("Could not read data from db")
     }
 }

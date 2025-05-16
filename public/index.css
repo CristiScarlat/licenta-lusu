@@ -151,3 +151,10 @@ table tr.green {
 div:has(>table) {
     padding: 1rem;
 }
+
+.pagination-footer {
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
