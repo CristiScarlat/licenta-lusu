@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { getFirestore, doc, setDoc, addDoc, getDoc, getDocs, updateDoc, deleteField, arrayUnion, arrayRemove, query, collection, limit, orderBy } from "firebase/firestore";
+import { getFirestore, doc, setDoc, addDoc, getDoc, getDocs, updateDoc, deleteField, arrayUnion, arrayRemove, query, collection, limit, orderBy, startAfter, startAt } from "firebase/firestore";
 import {firebaseConfig} from "./fb-credentials.js";
 
 const app = initializeApp(firebaseConfig);
@@ -66,28 +66,71 @@ export const addAccessDataToHistoryDB = async (data) => {
 }
 
 
-export const getAccessDataFromHistoryDB = async (pageLimit=10, offset=0) => {
-    try {
-        if(offset === 0)lastVisible = null;
-        const logs = [];
-        let q = null;
-        if(lastVisible){
-            q = query(collection(db, "control-access-app-logs"),
-                orderBy("time", "desc"),
-                startAfter(lastVisible),
-                limit(pageLimit));
-        }
-        else {
-            q = query(collection(db, "control-access-app-logs"), orderBy("time", "desc"), limit(pageLimit));
+let cursors = [null]; // first page starts with null
+let currentPageIndex = 0;
 
-        }
+export const getAccessDataFromHistoryDB = async (
+  pageLimit = 10,
+  direction = "next"
+) => {
+  try {
+    const logs = [];
 
-        const docSnap = await getDocs(q);
-        docSnap.forEach((doc) => logs.push(doc.data()));
-        return logs;
+    if (direction === "next") {
+      currentPageIndex++;
+      if (cursors.length <= currentPageIndex) cursors.push(null); // reserve space
+    } else if (direction === "prev") {
+      if (currentPageIndex > 0) {
+        currentPageIndex--;
+      }
     }
-    catch (error) {
-        console.log(error)
-        throw new Error("Could not read data from db")
+
+    const currentCursor = cursors[currentPageIndex];
+
+    let q;
+
+    if (currentCursor) {
+      if (direction === "next") {
+        q = query(
+          collection(db, "control-access-app-logs"),
+          orderBy("time", "desc"),
+          startAfter(currentCursor),
+          limit(pageLimit)
+        );
+      } else {
+        q = query(
+          collection(db, "control-access-app-logs"),
+          orderBy("time", "desc"),
+          startAt(currentCursor),
+          limit(pageLimit)
+        );
+      }
+    } else {
+      q = query(
+        collection(db, "control-access-app-logs"),
+        orderBy("time", "desc"),
+        limit(pageLimit)
+      );
     }
-}
+
+    const docSnap = await getDocs(q);
+    const docs = docSnap.docs;
+
+    if (docs.length > 0) {
+      // Save the first document of the page as the cursor
+      cursors[currentPageIndex] = docs[0];
+
+      // Pre-load the next page cursor (to be used for next request)
+      if (direction === "next") {
+        cursors[currentPageIndex + 1] = docs[docs.length - 1];
+      }
+    }
+
+    docs.forEach((doc) => logs.push(doc.data()));
+
+    return logs;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Could not read data from db");
+  }
+};

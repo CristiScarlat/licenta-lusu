@@ -142,9 +142,11 @@ function runWebserver() {
                 res.end(JSON.stringify(error));
             }
         }
-        else if (req.method === "GET" && req.url === "/history") {
+        else if (req.method === "GET" && req.url.includes("/history")) {
             try {
-                const logs = await getAccessDataFromHistoryDB();
+                const direction = req.url.includes("?") ? req.url.split("?")[1]?.split("=")[1] : "prev";
+                const pageQty = 15;
+                const logs = await getAccessDataFromHistoryDB(pageQty, direction);
                 res.setHeader("Content-Type", "application/json");
                 res.writeHead(200);
                 res.end(JSON.stringify(logs));
@@ -229,6 +231,6 @@ async function handleAccessByScannedRFID(error, rfid) {
 
 }
 
-initRFID(handleAccessByScannedRFID)
+//initRFID(handleAccessByScannedRFID)
 
 runWebserver()

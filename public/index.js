@@ -25,7 +25,7 @@ adminBtn.addEventListener("click", () => {
 
 const onNavigate = (path) => {
     console.log("on-navigate", path)
-    switch(path){
+    switch (path) {
         case "/":
             monitorBtn.classList.add("current");
             historyBtn.classList.remove("current");
@@ -95,31 +95,31 @@ function renderAdminPage() {
     const scanBtn = document.querySelector("#add-user-form .scan-btn");
     scanBtn.addEventListener("click", async (e) => {
         e.preventDefault();
-        try{
+        try {
             const res = await fetch("/scan-card");
             const data = await res.json();
             const cardIdInput = document.querySelector('#add-user-form input[name="cardID"]');
             cardIdInput.value = data.cardId;
-        } 
-        catch(error){
+        }
+        catch (error) {
             console.log(error)
         }
     });
-    
+
     const addPersonForm = document.querySelector("#add-user-form form");
     addPersonForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const formData = new FormData(e.target); 
+        const formData = new FormData(e.target);
         const name = formData.get("name");
-        const email = formData.get("email"); 
-        const accessDoor = formData.get("accessDoor"); 
-        const cardId = formData.get("cardID"); 
-        try{
-            const res = await fetch("/register-member", {method: "POST", body: JSON.stringify({name, email, accessDoor, cardId})});
+        const email = formData.get("email");
+        const accessDoor = formData.get("accessDoor");
+        const cardId = formData.get("cardID");
+        try {
+            const res = await fetch("/register-member", { method: "POST", body: JSON.stringify({ name, email, accessDoor, cardId }) });
             const data = await res.json();
             alert("Membru salvat cu succes.");
-        } 
-        catch(error){
+        }
+        catch (error) {
             console.log(error);
             alert("A aparut o eroare!");
         }
@@ -155,12 +155,12 @@ function renderMainScreen() {
     const manualBtns = document.querySelectorAll("#manual-doors-section button")
 
     manualBtns.forEach(button => {
-        button.addEventListener("click", async() => {
-            try{
-                await fetch('/access-gate', { method: "POST", body: JSON.stringify({accessDoor: button.innerText}) })
+        button.addEventListener("click", async () => {
+            try {
+                await fetch('/access-gate', { method: "POST", body: JSON.stringify({ accessDoor: button.innerText }) })
             }
-            catch(error){
-            alert("Ușa nu poate fi acționată manual!")
+            catch (error) {
+                alert("Ușa nu poate fi acționată manual!")
             }
         })
     })
@@ -197,9 +197,9 @@ async function renderHistoryScreen() {
         const contentContainer = document.createElement("div");
         const res = await fetch('/history');
         const logs = await res.json();
-        const table = Table({head: historyTableCols, body: logs});
+        const table = Table({ head: historyTableCols, body: logs });
         const pagination = document.createElement("div");
-        pagination.className="pagination-footer";
+        pagination.className = "pagination-footer";
         pagination.innerHTML = `
             <button id="prev-btn">Pagina anterioară</button>
             <button id="next-btn">Pagina următoare</button>
@@ -208,19 +208,23 @@ async function renderHistoryScreen() {
         mainContainer.append(contentContainer);
         const prevPageBtn = document.getElementById("prev-btn");
         const nextPageBtn = document.getElementById("next-btn");
-        prevPageBtn.addEventListener("click", () => {
-            if(historyPage > 0)historyPage--;
-            })
+        prevPageBtn.addEventListener("click", async () => {
+            const res = await fetch(`/history?direction=prev`);
+            const logs = await res.json();
+            const tableObj = document.querySelector("table");
+            tableObj.remove();
+            const table = Table({ head: historyTableCols, body: logs });
+            contentContainer.appendChild(table)
+        })
         nextPageBtn.addEventListener("click", async () => {
-                historyPage++;
-                const res = await fetch('/history');
-                const logs = await res.json();
-                const tableObj = document.querySelector("table");
-                tableObj.remove();
-                const table = Table({head: historyTableCols, body: logs});
-                contentContainer.appendChild(table)
-            })    
- 
+            const res = await fetch(`/history?direction=next`);
+            const logs = await res.json();
+            const tableObj = document.querySelector("table");
+            tableObj.remove();
+            const table = Table({ head: historyTableCols, body: logs });
+            contentContainer.appendChild(table)
+        })
+
     }
     catch (error) {
         alert(error.toString())
