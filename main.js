@@ -193,7 +193,7 @@ function runWebserver() {
     const server = http.createServer(requestListener);
     server.listen(port, host, () => {
         console.log(`Server is running on http://${host}:${port}`);
-        //open(`http://${host}:${port}`, { app: ['chromium-browser', '--kiosk'] });
+        open(`http://${host}:${port}`, { app: ['chromium-browser', '--kiosk'] });
     });
 }
 
