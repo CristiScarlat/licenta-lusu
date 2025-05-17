@@ -96,21 +96,21 @@ export function Table(tableData) {
     const tableHead = document.createElement("thead");
     const tableBody = document.createElement("tbody");
 
-    console.log(tableData?.body)
     tableHead.innerHTML = `
         <tr>
         ${Object.keys(tableData.head).map(col => `<th>${col}</th>`).join("")}
         </tr>
     `
-
-    tableBody.innerHTML = tableData.body.map(obj => {
-        return(
-        `<tr class=${obj["error"] === null ? "green" : "red"}>
-        ${Object.keys(tableData.head).map(col => `<td>${obj[tableData.head[col]] ? col === "Data" ? formatDate(obj[tableData.head[col]]) : obj[tableData.head[col]] : "-"}</td>`).join("")}
-        </tr>`
-    )
-    }).join("")
-
+    if(tableData.body && tableData.body.length > 0){
+            
+        tableBody.innerHTML = tableData?.body?.map(obj => {
+            return(
+            `<tr class=${obj["error"] === null ? "green" : "red"}>
+            ${Object.keys(tableData.head).map(col => `<td>${obj[tableData.head[col]] ? col === "Data" ? formatDate(obj[tableData.head[col]]) : obj[tableData.head[col]] : "-"}</td>`).join("")}
+            </tr>`
+        )
+        }).join("")
+        }
     table.append(tableHead, tableBody);
     return table
 }
