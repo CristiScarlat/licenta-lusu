@@ -2,11 +2,9 @@ import open from 'open';
 import http from 'http';
 import fs, { access } from 'fs';
 import url from 'url';
-// import { toggleRelay, getRelaysState } from "./gpio.js";
-// import { saveSchedule } from "./scheduleHandler.js";
 import { getDataByCardID, login, logout, addAccessDataToHistoryDB, getAccessDataFromHistoryDB, addPersonToDBwithCardId, auth } from "./services/fb.js";
 import { getReqBody, formatRFID } from "./utils.js";
-import { openDoorWithTimer, getRelaysState, getCurrentPers, initRFID, readRFIDwithTimeout } from './services/rpi.js';
+import { openDoorWithTimer, getRelaysState, getCurrentPers, initRFID, readRFIDwithTimeout, initGpioRelays } from './services/rpi.js';
 
 function runWebserver() {
     const host = '0.0.0.0';
@@ -185,7 +183,7 @@ function runWebserver() {
                 console.log(error)
                 res.setHeader("Content-Type", "application/json");
                 res.writeHead(500);
-                res.end(JSON.stringify(error));
+                res.end(JSON.stringify(errofir));
             }
         }
     };
@@ -241,6 +239,7 @@ async function handleAccessByScannedRFID(error, rfid) {
 
 }
 
-initRFID(handleAccessByScannedRFID)
+initRFID(handleAccessByScannedRFID);
+initGpioRelays();
 
-runWebserver()
+runWebserver();
