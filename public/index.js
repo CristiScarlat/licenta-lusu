@@ -23,6 +23,8 @@ adminBtn.addEventListener("click", () => {
     router.navigate("/admin")
 });
 
+const spinner = document.getElementById("spinner");
+
 const onNavigate = (path) => {
     console.log("on-navigate", path)
     switch (path) {
@@ -192,6 +194,7 @@ async function renderHistoryScreen() {
 
         mainContainer.innerHTML = "";
         const contentContainer = document.createElement("div");
+        spinner.style = "display: flex;";
         const res = await fetch('/history');
         const logs = await res.json();
         const table = Table({ head: historyTableCols, body: logs });
@@ -205,21 +208,26 @@ async function renderHistoryScreen() {
         mainContainer.append(contentContainer);
         const prevPageBtn = document.getElementById("prev-btn");
         const nextPageBtn = document.getElementById("next-btn");
+        spinner.style = "display: none;";
         prevPageBtn.addEventListener("click", async () => {
+            spinner.style = "display: flex;";
             const res = await fetch(`/history?direction=prev`);
             const logs = await res.json();
             const tableObj = document.querySelector("table");
             tableObj.remove();
             const table = Table({ head: historyTableCols, body: logs });
-            contentContainer.appendChild(table)
+            contentContainer.appendChild(table);
+            spinner.style = "display: none;";
         })
         nextPageBtn.addEventListener("click", async () => {
+            spinner.style = "display: flex;";
             const res = await fetch(`/history?direction=next`);
             const logs = await res.json();
             const tableObj = document.querySelector("table");
             tableObj.remove();
             const table = Table({ head: historyTableCols, body: logs });
-            contentContainer.appendChild(table)
+            contentContainer.appendChild(table);
+            spinner.style = "display: none;";
         })
 
     }
@@ -234,20 +242,24 @@ function initPool() {
         try {
             const res = await fetch('/access-gate')
             const data = await res.json();
-            console.log(data.persons)
             const presentDoorsSection = document.getElementById("doors-section");
             const currentPersonAccess = document.getElementById("users-access-display");
-            if (presentDoorsSection) {
+            if (data.doors && presentDoorsSection) {
                 const doors = DoorsSection(data.doors);
                 presentDoorsSection.replaceWith(doors);
             }
-            if(currentPersonAccess){
+            if(data.persons && currentPersonAccess){
                 currentPersonAccess.innerHTML = "<label>Informații card scanat</label>";
                data.persons.forEach(persInfo => {
+                   const p = document.createElement("p");
                    if(persInfo.name){
-                       const p = document.createElement("p");
                        p.style = "background-color: darkgreen;color: white;padding: 1rem;";
                        p.innerText = `${persInfo.name} are acces pe poarta ${persInfo.accessDoor}`;
+                       currentPersonAccess.append(p)
+                   }
+                   else if(persInfo.error){
+                       p.style = "background-color: darkred;color: white;padding: 1rem;";
+                       p.innerText = persInfo.error;
                        currentPersonAccess.append(p)
                    }
                    

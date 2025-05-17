@@ -5,8 +5,11 @@ const relays = [0,0,0,0];
 const persInfo = [{}, {}, {}, {}]
 
 export function openDoorWithTimer(data) { 
-    const doorNo = data.accessDoor 
-    relays[doorNo-1] = 1;
+    if(data?.error){
+        persInfo[0] = data
+    }
+    const doorNo = data?.accessDoor || 1;
+    if(data.error === undefined)relays[doorNo-1] = 1;
     persInfo[doorNo-1] = data;
     clearInterval(timerIds[doorNo-1])
     const timerId = setTimeout(() => {
@@ -27,7 +30,13 @@ export function getCurrentPers() {
 
 export function initRFID(cb){
     console.log("init rfid scanner...")
-	return setInterval(() => rfid.read(cb), 3000);	
+	return setInterval(() => {
+        rfid.readintime(500, (error, result) => {
+            if(error)return
+            else if(!result.includes("["))return
+            else cb(null, result)
+        });
+    }, 1000);	
 }
 
 export function readRFIDwithTimeout() {

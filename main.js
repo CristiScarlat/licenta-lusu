@@ -193,41 +193,51 @@ function runWebserver() {
     const server = http.createServer(requestListener);
     server.listen(port, host, () => {
         console.log(`Server is running on http://${host}:${port}`);
-        open(`http://${host}:${port}`, { app: ['chromium-browser', '--kiosk'] });
+        //open(`http://${host}:${port}`, { app: ['chromium-browser', '--kiosk'] });
     });
 }
 
 let throttleId = null;
 async function handleAccessByScannedRFID(error, rfid) {
+    console.log("rfid", rfid);
     if(throttleId)return;
     throttleId = setTimeout(async () => {
             try{
                 if(error === null){
                     const cardId = formatRFID(rfid)
-                    console.log(cardId)
-                    const data = await getDataByCardID(cardId);
-                    console.log(data)
-                    openDoorWithTimer(data);
-                    const historyData = {
-                            error: null,
-                            name: data.name,
-                            email: data.email,
-                            accessDoor: data.accessDoor,
-                            cardIdValue: data.cardId,
-                            operatorEmail: auth.currentUser?.email || null,
-                            operatorUID: auth.currentUser?.uid || null,
-                            time: Date.now()
+                    console.log("--->>", cardId, rfid)
+                    if(cardId){
+                        const data = await getDataByCardID(cardId);
+                        console.log("getDataByCardId", data)
+                        if(data){
+                            openDoorWithTimer(data);
+                            const historyData = {
+                                    error: null,
+                                    name: data.name,
+                                    email: data.email,
+                                    accessDoor: data.accessDoor,
+                                    cardIdValue: data.cardId,
+                                    operatorEmail: auth.currentUser?.email || null,
+                                    operatorUID: auth.currentUser?.uid || null,
+                                    time: Date.now()
+                            }
+                            await addAccessDataToHistoryDB(historyData);
+                        }
+                        else {
+                            openDoorWithTimer({error: "Card neînregistrat, accesul nu este permis!"});
+                        }
                     }
-                    await addAccessDataToHistoryDB(historyData);
                 } else throw error;
             } 
             catch(error){
                 console.log(error)
-                await addAccessDataToHistoryDB({time: Date.now(), error: "Card neînregistrat, accesul nu este permis!"});
+                if(error.message !== "Could not read data from db"){
+                    await addAccessDataToHistoryDB({time: Date.now(), error: "Card neînregistrat, accesul nu este permis!"});
+                }
             }
             clearTimeout(throttleId)
             throttleId = null;
-    }, 1000)
+    }, 2000)
 
 }
 

@@ -57,7 +57,7 @@ export const addPersonToDBwithCardId = async (data) => {
 export const addAccessDataToHistoryDB = async (data) => {
     try {
         const docsRef = doc(db, 'control-access-app-logs', `${data.time}`);
-        console.log(data)
+        console.log("fb => ", data)
         return setDoc(docsRef, data);
     }
     catch (error) {
